@@ -91,12 +91,13 @@ class MainWindow:
         self.exportButton.grid(row=1, column=1, padx=10, pady=10)
 
         self.graphButton = tk.Button(
-            buttonFrame, command=self.Graph, text="Grafikler", state=NORMAL)
+            buttonFrame, command=self.Graph, text="Grafiğe Dök", state=NORMAL)
         self.graphButton.grid(row=1, column=2, padx=10, pady=10)
 
         result = self.ReadData()
         comboElements = ['', '', '', '', '', '', '', '']
         if(result.columns.size > 0):
+            print(result.columns.size)
             for i in range(result.columns.size - 2):
                 comboElements[i] = result.columns[i+1]
 
