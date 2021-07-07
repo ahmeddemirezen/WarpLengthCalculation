@@ -59,7 +59,7 @@ class MainWindow:
         self.ropeyarnEntry.grid(row=7, column=0)
 
         self.bobbinWeightLabel = tk.Label(
-            mainFrame, text="Ort. Bobin Ağırlığı (kg)")
+            mainFrame, text="Ort. Bobin Ağırlığı (g)")
         self.bobbinWeightLabel.grid(row=8, column=0)
 
         self.bobbinWeightEntry = tk.Entry(mainFrame)
@@ -91,8 +91,19 @@ class MainWindow:
         self.exportButton.grid(row=1, column=1, padx=10, pady=10)
 
         self.graphButton = tk.Button(
-            buttonFrame, command=self.Graph, text="Grafikler", state=DISABLED)
+            buttonFrame, command=self.Graph, text="Grafikler", state=NORMAL)
         self.graphButton.grid(row=1, column=2, padx=10, pady=10)
+
+        result = self.ReadData()
+        comboElements = ['', '', '', '', '', '', '', '']
+        if(result.columns.size > 0):
+            for i in range(result.columns.size - 2):
+                comboElements[i] = result.columns[i+1]
+
+        self.graphCombo = ttk.Combobox(
+            buttonFrame, state='readonly', values=comboElements)
+        self.graphCombo.set("Band Sayısı")
+        self.graphCombo.grid(row=2, column=2)
 
     def WarningFrame(self, warningFrame):
         self.warningText = tk.StringVar()
@@ -112,7 +123,7 @@ class MainWindow:
                 bobbinAmount = self.roundToUp(bobbinAmount)
 
                 totalLength = float(
-                    bobbinAmount * float(self.oneUnitRopeEntry.get()) * ((float(self.bobbinWeightEntry.get()) * 1000) - 40))
+                    bobbinAmount * float(self.oneUnitRopeEntry.get()) * (float(self.bobbinWeightEntry.get()) - 40))
                 totalLength = totalLength / float(self.ropeyarnEntry.get())
 
                 newRopeVal = 0
@@ -151,7 +162,7 @@ class MainWindow:
             self.warningText.set("Hata")
 
     def Export(self):
-        result = self.TakeData()
+        result = self.WriteData()
         result.to_excel('data.xlsx', sheet_name='sheet1', index=False)
 
         self.warningLabel["fg"] = "green"
@@ -159,22 +170,22 @@ class MainWindow:
         self.exportButton["state"] = DISABLED
 
     def Graph(self):
-        pass
-        #! need to add data to the excel file as number not as string
+        result = self.ReadData()
+        result[self.graphCombo.get()].plot()
+        plt.show()
 
-    def TakeData(self):
-        if(os.path.isfile('data.xlsx')):
-            dfRead = pd.read_excel("data.xlsx")
+    def WriteData(self):
+        dfRead = self.ReadData()
 
         l1 = ["İplik Numarası",
-              "1 gram İpin metrajı (m)", "Toplam Bobin Sayısı", "Tel Sayısı", "Ort. Bobin Ağırlığı(kg)"]
+              "1 gram İpin metrajı (m)", "Toplam Bobin Sayısı", "Tel Sayısı", "Ort. Bobin Ağırlığı(g)"]
         l2 = self.labelNames
         l = l1 + l2
 
-        r1 = [str(self.ropeEntry.get())+str(self.ropeCombo.get()), str(self.oneUnitRopeEntry.get()),
-              str(self.bobbinCountEntry.get()), str(self.ropeyarnEntry.get()), str(self.bobbinWeightEntry.get())]
-        r2 = [str(self.entries[0].get()), str(self.entries[1].get()), str(
-            self.entries[2].get()), str(self.entries[3].get()), str(self.entries[4].get())]
+        r1 = [str(self.ropeEntry.get())+str(self.ropeCombo.get()), float(self.oneUnitRopeEntry.get()),
+              float(self.bobbinCountEntry.get()), float(self.ropeyarnEntry.get()), float(self.bobbinWeightEntry.get())]
+        r2 = [float(self.entries[0].get()), float(self.entries[1].get()), float(
+            self.entries[2].get()), float(self.entries[3].get()), str(self.entries[4].get())]
         r = r1 + r2
 
         myDict = {}
@@ -187,6 +198,12 @@ class MainWindow:
         result = pd.concat([dfRead, df])
 
         return result
+
+    def ReadData(self):
+        if(os.path.isfile('data.xlsx')):
+            return pd.read_excel("data.xlsx")
+        else:
+            return pd.DataFrame().to_excel('data.xlsx')
 
     def roundToUp(self, number):
         result = number
