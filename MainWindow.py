@@ -1,4 +1,3 @@
-from datetime import date, time
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -6,82 +5,135 @@ import pandas as pd
 import tkinter as tk
 from tkinter import ttk
 import FilterWindow as fw
-from tkinter.constants import DISABLED, NORMAL, TOP
+from tkinter.constants import BOTTOM, CENTER, DISABLED, E, FLAT, LEFT, NORMAL, RIGHT, TOP, W
 
 
 class MainWindow:
+
     def __init__(self, screen):
+        # Variables
+        self.dataLabels = ["İplik Numarası", "Renk Kodu", "Lot Numarası",
+                           "1 gram İpin metrajı (m)", "Toplam Bobin Sayısı",
+                           "Tel Sayısı", "Ort. Bobin Ağırlığı(g)",
+                           "Yaklaşık Bobin Başı Fire (g)", "Band Sayısı",
+                           "Bobin Sayısı", "Artan Bobin", "Toplam Fire (g)",
+                           "Max Uzunluk",  "Yeni İplik Numarası"]
+        print(self.dataLabels[8:])
+        self.isFWindowOpen = False
+
         self.myScreen = screen
 
-        mainFrame = tk.Frame(screen)
-        mainFrame.pack(side=TOP)
+        bottomGroup = tk.Frame(screen)
+        bottomGroup.pack(side=BOTTOM, fill="x", padx=10, pady=10)
 
-        buttonFrame = tk.Frame(screen)
-        buttonFrame.pack(side=TOP)
+        resultFrame = tk.Frame(bottomGroup)
+        resultFrame.pack(side=BOTTOM)
 
-        warnFrame = tk.Frame(screen)
-        warnFrame.pack(side=TOP)
+        warnFrame = tk.Frame(bottomGroup)
+        warnFrame.pack(side=BOTTOM)
 
-        resultFrame = tk.Frame(screen)
-        resultFrame.pack(side=TOP)
+        buttonFrame = tk.Frame(bottomGroup)
+        buttonFrame.pack(side=BOTTOM)
 
-        self.MainFrame(mainFrame)
+        leftGroup = tk.Frame(screen)
+        leftGroup.pack(side=LEFT, fill="both", expand=True, padx=10, pady=10)
+
+        calcHeaderFrame = tk.Frame(leftGroup)
+        calcHeaderFrame.pack(side=TOP)
+
+        calcFrame = tk.Frame(leftGroup)
+        calcFrame.pack(side=TOP)
+
+        rightGroup = tk.Frame(screen)
+        rightGroup.pack(side=RIGHT, fill="both", expand=True, padx=10, pady=10)
+
+        infoHeaderFrame = tk.Frame(rightGroup)
+        infoHeaderFrame.pack(side=TOP)
+
+        infoFrame = tk.Frame(rightGroup)
+        infoFrame.pack(side=TOP)
+
+        self.CalcFrame(calcFrame)
+        self.InfoFrame(infoFrame)
         self.ResultFrame(resultFrame)
         self.ButtonFrame(buttonFrame)
         self.WarningFrame(warnFrame)
 
-    def MainFrame(self, mainFrame):
-        self.ropeLabel = tk.Label(mainFrame, text="İplik Numarası")
+        # Header
+        calcHeader = tk.Label(calcHeaderFrame, text="Hesaplama Bilgileri")
+        calcHeader.pack(pady=20)
+
+        infoHeader = tk.Label(infoHeaderFrame, text="İplik Bilgileri")
+        infoHeader.pack(pady=20)
+
+    def CalcFrame(self, calcFrame):
+
+        self.oneUnitRopeLabel = tk.Label(
+            calcFrame, text="1 gram İpin metrajı (m)")
+        self.oneUnitRopeLabel.grid(row=0, column=0)
+
+        self.oneUnitRopeEntry = tk.Entry(calcFrame)
+        self.oneUnitRopeEntry.grid(row=1, column=0)
+
+        self.bobbinCountLabel = tk.Label(calcFrame, text="Toplam Bobin Sayısı")
+        self.bobbinCountLabel.grid(row=2, column=0)
+
+        self.bobbinCountEntry = tk.Entry(calcFrame)
+        self.bobbinCountEntry.grid(row=3, column=0)
+
+        self.ropeyarnLabel = tk.Label(calcFrame, text="Tel Sayısı")
+        self.ropeyarnLabel.grid(row=4, column=0)
+
+        self.ropeyarnEntry = tk.Entry(calcFrame)
+        self.ropeyarnEntry.grid(row=5, column=0)
+
+        self.bobbinWeightLabel = tk.Label(
+            calcFrame, text="Ort. Bobin Ağırlığı (g)")
+        self.bobbinWeightLabel.grid(row=6, column=0)
+
+        self.bobbinWeightEntry = tk.Entry(calcFrame)
+        self.bobbinWeightEntry.grid(row=7, column=0)
+
+        self.meanBobbinWasteLabel = tk.Label(
+            calcFrame, text="Yaklaşık Bobin Başı Fire (g)")
+        self.meanBobbinWasteLabel.grid(row=8, column=0)
+
+        self.meanBobbinWasteEntry = tk.Entry(calcFrame)
+        self.meanBobbinWasteEntry.grid(row=9, column=0)
+
+    def InfoFrame(self, infoFrame):
+
+        self.ropeLabel = tk.Label(
+            infoFrame, text="İplik Numarası")
         self.ropeLabel.grid(row=0, column=0)
 
-        self.ropeEntry = tk.Entry(mainFrame)
+        self.ropeEntry = tk.Entry(infoFrame)
         self.ropeEntry.grid(row=1, column=0)
 
         vlist = ["DN", "DTEX", "NE"]
         self.ropeCombo = ttk.Combobox(
-            mainFrame, state='readonly', values=vlist)
+            infoFrame, state='readonly', values=vlist)
         self.ropeCombo.set("İp Türü Seçin")
-        self.ropeCombo.grid(row=1, column=1)
+        self.ropeCombo.grid(row=1, column=1, padx=5)
 
-        self.colorCodeLabel = tk.Label(mainFrame, text="Renk Kodu")
-        self.colorCodeLabel.grid(row=2, column=1)
+        self.colorCodeLabel = tk.Label(infoFrame, text="Renk Kodu")
+        self.colorCodeLabel.grid(row=2, column=0)
 
-        self.colorCodeEntry = tk.Entry(mainFrame)
-        self.colorCodeEntry.grid(row=3, column=1)
+        self.colorCodeEntry = tk.Entry(infoFrame)
+        self.colorCodeEntry.grid(row=3, column=0)
 
-        self.oneUnitRopeLabel = tk.Label(
-            mainFrame, text="1 gram İpin metrajı (m)")
-        self.oneUnitRopeLabel.grid(row=2, column=0)
+        self.lotNumberLabel = tk.Label(infoFrame, text="Lot Numarası")
+        self.lotNumberLabel.grid(row=4, column=0)
 
-        self.oneUnitRopeEntry = tk.Entry(mainFrame)
-        self.oneUnitRopeEntry.grid(row=3, column=0)
-
-        self.bobbinCountLabel = tk.Label(mainFrame, text="Toplam Bobin Sayısı")
-        self.bobbinCountLabel.grid(row=4, column=0)
-
-        self.bobbinCountEntry = tk.Entry(mainFrame)
-        self.bobbinCountEntry.grid(row=5, column=0)
-
-        self.ropeyarnLabel = tk.Label(mainFrame, text="Tel Sayısı")
-        self.ropeyarnLabel.grid(row=6, column=0)
-
-        self.ropeyarnEntry = tk.Entry(mainFrame)
-        self.ropeyarnEntry.grid(row=7, column=0)
-
-        self.bobbinWeightLabel = tk.Label(
-            mainFrame, text="Ort. Bobin Ağırlığı (g)")
-        self.bobbinWeightLabel.grid(row=8, column=0)
-
-        self.bobbinWeightEntry = tk.Entry(mainFrame)
-        self.bobbinWeightEntry.grid(row=9, column=0)
+        self.lotNumberEntry = tk.Entry(infoFrame)
+        self.lotNumberEntry.grid(row=5, column=0)
 
     def ResultFrame(self, resultFrame):
         self.entries = {}
-        self.labelNames = ["Band Sayısı", "Bobin Sayısı",
-                           "Artan Bobin", "Max Uzunluk", "Yeni İplik Numarası"]
+        self.labelNames = self.dataLabels[8:]
 
         for i in range(2):
-            for k in range(5):
+            for k in range(6):
                 self.entries[k] = tk.StringVar()
                 if(i == 0):
                     self.entries[k].set(self.labelNames[k])
@@ -101,24 +153,8 @@ class MainWindow:
         self.exportButton.grid(row=1, column=1, padx=10, pady=10)
 
         self.graphButton = tk.Button(
-            buttonFrame, command=self.Graph, text="Grafiğe Dök", state=NORMAL)
+            buttonFrame, command=self.Filter, text="Grafik Seçenekleri", state=NORMAL)
         self.graphButton.grid(row=1, column=2, padx=10, pady=10)
-
-        result = self.ReadData()
-        comboElements = ["", "", "", "", "", "", "", "", ""]
-        print(type(result))
-        if(result.columns.size > 0):
-            for i in range(result.columns.size - 2):
-                comboElements[i] = result.columns[i+1]
-
-        self.graphCombo = ttk.Combobox(
-            buttonFrame, state='readonly', values=comboElements)
-        self.graphCombo.set("Band Sayısı")
-        self.graphCombo.grid(row=2, column=2)
-
-        self.filterButton = tk.Button(
-            buttonFrame, text="F", height=1, width=1, command=self.Filter)
-        self.filterButton.grid(row=2, column=3)
 
     def WarningFrame(self, warningFrame):
         self.warningText = tk.StringVar()
@@ -138,7 +174,7 @@ class MainWindow:
                 bobbinAmount = self.roundToUp(bobbinAmount)
 
                 totalLength = float(
-                    bobbinAmount * float(self.oneUnitRopeEntry.get()) * (float(self.bobbinWeightEntry.get()) - 40))
+                    bobbinAmount * float(self.oneUnitRopeEntry.get()) * (float(self.bobbinWeightEntry.get()) - float(self.meanBobbinWasteEntry.get())))
                 totalLength = totalLength / float(self.ropeyarnEntry.get())
 
                 newRopeVal = 0
@@ -156,8 +192,10 @@ class MainWindow:
                 self.entries[1].set(float(bobbinAmount))
                 self.entries[2].set(
                     float(self.bobbinCountEntry.get()) - bobbinAmount)
-                self.entries[3].set(totalLength)
-                self.entries[4].set(
+                self.entries[3].set((float(self.entries[2].get())*float(self.bobbinWeightEntry.get())) + (
+                    float(bobbinAmount)*float(self.meanBobbinWasteEntry.get())))
+                self.entries[4].set(totalLength)
+                self.entries[5].set(
                     str("{:.2f}".format(newRopeVal)) + self.ropeCombo.get())
 
                 self.exportButton['state'] = NORMAL
@@ -166,12 +204,13 @@ class MainWindow:
                 self.warningText.set("Hata")
                 self.exportButton['state'] = DISABLED
 
-        except Exception as e:
+        except AttributeError:
             self.entries[0].set("-----")
             self.entries[1].set("-----")
             self.entries[2].set("-----")
             self.entries[3].set("-----")
             self.entries[4].set("-----")
+            self.entries[5].set("-----")
             self.exportButton['state'] = DISABLED
             self.warningLabel["fg"] = "red"
             self.warningText.set("Hata")
@@ -184,53 +223,32 @@ class MainWindow:
         self.warningText.set("Dışa Aktarım Başarılı.")
         self.exportButton["state"] = DISABLED
 
-    def Graph(self):
-        try:
-            result = self.ReadData()
-
-            filterResult = self.filterWindow.GetFilter()
-            for i, e in enumerate(filterResult):
-                if(filterResult[e] != ""):
-                    filtered = result.loc[result[e] == filterResult[e]]
-                    result = pd.DataFrame(filtered)
-
-            labelInput = self.graphCombo.get()
-            result[labelInput].plot()
-            plt.ylabel(labelInput)
-            plt.title(str(date.today()))
-            plt.show()
-        except AttributeError:
-            result = self.ReadData()
-            labelInput = self.graphCombo.get()
-            result[labelInput].plot()
-            plt.ylabel(labelInput)
-            plt.title(str(date.today()))
-            plt.show()
-
     def Filter(self):
-        window = tk.Toplevel(self.myScreen)
-        window.title("Filtre Seçenekleri")
-        window.geometry("300x300")
-        self.filterWindow = fw.FilterWindow(window)
-        self.filterWindow.GetFilter()
+        try:
+            if(self.isFWindowOpen == False):
+                self.filterScene = tk.Toplevel(self.myScreen)
+                self.filterScene.title("Grafik Seçenekleri")
+                self.filterScene.geometry("400x450+850+50")
+                self.filterWindow = fw.FilterWindow(self.filterScene)
+                self.filterScene.protocol(
+                    "WM_DELETE_WINDOW", self.filterOnClose)
+                self.isFWindowOpen = True
+
+        except AttributeError:
+            pass
 
     def WriteData(self):
         dfRead = self.ReadData()
 
-        l1 = ["İplik Numarası", "Renk Kodu",
-              "1 gram İpin metrajı (m)", "Toplam Bobin Sayısı", "Tel Sayısı", "Ort. Bobin Ağırlığı(g)"]
-        l2 = self.labelNames
-        l = l1 + l2
-
-        r1 = [str(self.ropeEntry.get())+str(self.ropeCombo.get()), str(self.colorCodeEntry.get()), float(self.oneUnitRopeEntry.get()),
-              float(self.bobbinCountEntry.get()), float(self.ropeyarnEntry.get()), float(self.bobbinWeightEntry.get())]
+        r1 = [str(self.ropeEntry.get())+str(self.ropeCombo.get()), "c"+str(self.colorCodeEntry.get().upper()), "L"+str(self.lotNumberEntry.get().upper()), float(self.oneUnitRopeEntry.get()),
+              float(self.bobbinCountEntry.get()), float(self.ropeyarnEntry.get()), float(self.bobbinWeightEntry.get()), float(self.meanBobbinWasteEntry.get())]
         r2 = [float(self.entries[0].get()), float(self.entries[1].get()), float(
-            self.entries[2].get()), float(self.entries[3].get()), str(self.entries[4].get())]
+            self.entries[2].get()), float(self.entries[3].get()), float(self.entries[4].get()), str(self.entries[5].get())]
         r = r1 + r2
 
         myDict = {}
 
-        for count, element in enumerate(l):
+        for count, element in enumerate(self.dataLabels):
             myDict[element] = [r[count]]
 
         df = pd.DataFrame(myDict)
@@ -249,6 +267,10 @@ class MainWindow:
     def OnClose(self):
         plt.close()
         self.myScreen.destroy()
+
+    def filterOnClose(self):
+        self.isFWindowOpen = False
+        self.filterScene.destroy()
 
     def roundToUp(self, number):
         result = number
