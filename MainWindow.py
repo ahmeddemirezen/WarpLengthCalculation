@@ -1,13 +1,17 @@
+from datetime import date, time
 import os
-import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 import tkinter as tk
 from tkinter import ttk
+import FilterWindow as fw
 from tkinter.constants import DISABLED, NORMAL, TOP
 
 
 class MainWindow:
     def __init__(self, screen):
+        self.myScreen = screen
 
         mainFrame = tk.Frame(screen)
         mainFrame.pack(side=TOP)
@@ -38,6 +42,12 @@ class MainWindow:
             mainFrame, state='readonly', values=vlist)
         self.ropeCombo.set("İp Türü Seçin")
         self.ropeCombo.grid(row=1, column=1)
+
+        self.colorCodeLabel = tk.Label(mainFrame, text="Renk Kodu")
+        self.colorCodeLabel.grid(row=2, column=1)
+
+        self.colorCodeEntry = tk.Entry(mainFrame)
+        self.colorCodeEntry.grid(row=3, column=1)
 
         self.oneUnitRopeLabel = tk.Label(
             mainFrame, text="1 gram İpin metrajı (m)")
@@ -95,9 +105,9 @@ class MainWindow:
         self.graphButton.grid(row=1, column=2, padx=10, pady=10)
 
         result = self.ReadData()
-        comboElements = ['', '', '', '', '', '', '', '']
+        comboElements = ["", "", "", "", "", "", "", "", ""]
+        print(type(result))
         if(result.columns.size > 0):
-            print(result.columns.size)
             for i in range(result.columns.size - 2):
                 comboElements[i] = result.columns[i+1]
 
@@ -105,6 +115,10 @@ class MainWindow:
             buttonFrame, state='readonly', values=comboElements)
         self.graphCombo.set("Band Sayısı")
         self.graphCombo.grid(row=2, column=2)
+
+        self.filterButton = tk.Button(
+            buttonFrame, text="F", height=1, width=1, command=self.Filter)
+        self.filterButton.grid(row=2, column=3)
 
     def WarningFrame(self, warningFrame):
         self.warningText = tk.StringVar()
@@ -171,19 +185,44 @@ class MainWindow:
         self.exportButton["state"] = DISABLED
 
     def Graph(self):
-        result = self.ReadData()
-        result[self.graphCombo.get()].plot()
-        plt.show()
+        try:
+            result = self.ReadData()
+
+            filterResult = self.filterWindow.GetFilter()
+            for i, e in enumerate(filterResult):
+                if(filterResult[e] != ""):
+                    filtered = result.loc[result[e] == filterResult[e]]
+                    result = pd.DataFrame(filtered)
+
+            labelInput = self.graphCombo.get()
+            result[labelInput].plot()
+            plt.ylabel(labelInput)
+            plt.title(str(date.today()))
+            plt.show()
+        except AttributeError:
+            result = self.ReadData()
+            labelInput = self.graphCombo.get()
+            result[labelInput].plot()
+            plt.ylabel(labelInput)
+            plt.title(str(date.today()))
+            plt.show()
+
+    def Filter(self):
+        window = tk.Toplevel(self.myScreen)
+        window.title("Filtre Seçenekleri")
+        window.geometry("300x300")
+        self.filterWindow = fw.FilterWindow(window)
+        self.filterWindow.GetFilter()
 
     def WriteData(self):
         dfRead = self.ReadData()
 
-        l1 = ["İplik Numarası",
+        l1 = ["İplik Numarası", "Renk Kodu",
               "1 gram İpin metrajı (m)", "Toplam Bobin Sayısı", "Tel Sayısı", "Ort. Bobin Ağırlığı(g)"]
         l2 = self.labelNames
         l = l1 + l2
 
-        r1 = [str(self.ropeEntry.get())+str(self.ropeCombo.get()), float(self.oneUnitRopeEntry.get()),
+        r1 = [str(self.ropeEntry.get())+str(self.ropeCombo.get()), str(self.colorCodeEntry.get()), float(self.oneUnitRopeEntry.get()),
               float(self.bobbinCountEntry.get()), float(self.ropeyarnEntry.get()), float(self.bobbinWeightEntry.get())]
         r2 = [float(self.entries[0].get()), float(self.entries[1].get()), float(
             self.entries[2].get()), float(self.entries[3].get()), str(self.entries[4].get())]
@@ -204,7 +243,12 @@ class MainWindow:
         if(os.path.isfile('data.xlsx')):
             return pd.read_excel("data.xlsx")
         else:
-            return pd.DataFrame().to_excel('data.xlsx')
+            pd.DataFrame().to_excel('data.xlsx')
+            return pd.read_excel("data.xlsx")
+
+    def OnClose(self):
+        plt.close()
+        self.myScreen.destroy()
 
     def roundToUp(self, number):
         result = number
