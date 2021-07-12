@@ -10,8 +10,12 @@ import matplotlib.pyplot as plt
 class FilterWindow:
     def __init__(self, screen):
         # Variables
-        self.labels = ["İplik Numarası", "Renk Kodu", "1 gram İpin metrajı (m)",	"Toplam Bobin Sayısı",	"Tel Sayısı",
-                       "Ort. Bobin Ağırlığı(g)",	"Band Sayısı",	"Bobin Sayısı",	"Artan Bobin",	"Max Uzunluk",	"Yeni İplik Numarası"]
+        self.dataLabels = ["İplik Numarası", "Renk Kodu", "Lot Numarası",
+                           "1 gram İpin metrajı (m)", "Toplam Bobin Sayısı",
+                           "Tel Sayısı", "Ort. Bobin Ağırlığı(g)",
+                           "Yaklaşık Bobin Başı Fire (g)", "Band Sayısı",
+                           "Bobin Sayısı", "Artan Bobin", "Toplam Fire (g)",
+                           "Max Uzunluk",  "Yeni İplik Numarası"]
 
         topFrame = tk.Frame(screen)
         topFrame.pack(side=TOP)
@@ -32,21 +36,21 @@ class FilterWindow:
         self.cButtons = {}
         self.cbVariables = {}
 
-        for i in range(11):
+        for i in range(len(self.dataLabels)):
             self.cbVariables[i] = tk.IntVar()
             self.cButtons[i] = tk.Checkbutton(
                 mainFrame, command=self.UpdateMainFrame, variable=self.cbVariables[i])
             self.cButtons[i].grid(row=i, column=0)
             a = tk.Checkbutton(mainFrame)
 
-        for i in range(11):
+        for i in range(len(self.dataLabels)):
             sV = tk.StringVar()
-            sV.set(self.labels[i])
+            sV.set(self.dataLabels[i])
             self.lEntries[i] = tk.Entry(
                 mainFrame, textvariable=sV, state="readonly")
             self.lEntries[i].grid(row=i, column=1, padx=5)
 
-        for i in range(11):
+        for i in range(len(self.dataLabels)):
             self.entries[i] = tk.Entry(mainFrame, state=DISABLED)
             self.entries[i].grid(row=i, column=2)
 
@@ -55,12 +59,12 @@ class FilterWindow:
         self.comboHeaderLabel.grid(row=0, column=0, pady=5)
 
         self.comboBox = ttk.Combobox(
-            topFrame, values=self.labels[2:-1], state="readonly")
+            topFrame, values=self.dataLabels[2:-1], state="readonly")
         self.comboBox.set("Band Sayısı")
         self.comboBox.grid(row=1, column=0, pady=5)
 
-        self.filterHeaderLabel = tk.Label(topFrame, text="Filtre Seçenekleri")
-        self.filterHeaderLabel.grid(row=2, column=0, pady=5)
+        # self.filterHeaderLabel = tk.Label(topFrame, text="Filtre Seçenekleri")
+        # self.filterHeaderLabel.grid(row=2, column=0, pady=5)
 
     def BottomFrame(self, bottomFrame):
         self.terminateButton = tk.Button(
@@ -68,7 +72,7 @@ class FilterWindow:
         self.terminateButton.grid(row=0, column=0)
 
     def UpdateMainFrame(self):
-        for i in range(11):
+        for i in range(len(self.dataLabels)):
             if(self.cbVariables[i].get() == 1):
                 self.entries[i]["state"] = NORMAL
             else:
@@ -76,15 +80,19 @@ class FilterWindow:
 
     def GetFilter(self):
         result = {}
-        for i in self.labels:
+        for i in self.dataLabels:
             result[i] = ""
-        for i in range(11):
+        for i in range(len(self.dataLabels)):
             if(self.cbVariables[i].get() == 1):
                 if(i == 1):
-                    result[self.labels[i]] = "c" + \
+                    result[self.dataLabels[i]] = "c" + \
+                        str(self.entries[i].get().upper())
+                elif(i == 2):
+                    result[self.dataLabels[i]] = "L" + \
                         str(self.entries[i].get().upper())
                 else:
-                    result[self.labels[i]] = str(self.entries[i].get().upper())
+                    result[self.dataLabels[i]] = str(
+                        self.entries[i].get().upper())
         return result
 
     def Graph(self):
