@@ -1,11 +1,10 @@
 import os
-import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import tkinter as tk
 from tkinter import ttk
 import FilterWindow as fw
-from tkinter.constants import BOTTOM, CENTER, DISABLED, E, FLAT, LEFT, NORMAL, RIGHT, TOP, W
+from tkinter.constants import BOTTOM, DISABLED, LEFT, NORMAL, RIGHT, TOP
 
 
 class MainWindow:
@@ -18,7 +17,6 @@ class MainWindow:
                            "Yaklaşık Bobin Başı Fire (g)", "Band Sayısı",
                            "Bobin Sayısı", "Artan Bobin", "Toplam Fire (g)",
                            "Max Uzunluk",  "Yeni İplik Numarası"]
-        print(self.dataLabels[8:])
         self.isFWindowOpen = False
 
         self.myScreen = screen

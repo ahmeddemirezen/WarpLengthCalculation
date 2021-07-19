@@ -59,12 +59,9 @@ class FilterWindow:
         self.comboHeaderLabel.grid(row=0, column=0, pady=5)
 
         self.comboBox = ttk.Combobox(
-            topFrame, values=self.dataLabels[2:-1], state="readonly")
+            topFrame, values=self.dataLabels[3:-1], state="readonly")
         self.comboBox.set("Band Sayısı")
         self.comboBox.grid(row=1, column=0, pady=5)
-
-        # self.filterHeaderLabel = tk.Label(topFrame, text="Filtre Seçenekleri")
-        # self.filterHeaderLabel.grid(row=2, column=0, pady=5)
 
     def BottomFrame(self, bottomFrame):
         self.terminateButton = tk.Button(
@@ -77,6 +74,9 @@ class FilterWindow:
                 self.entries[i]["state"] = NORMAL
             else:
                 self.entries[i]["state"] = DISABLED
+                sV = tk.StringVar()
+                sV.set("")
+                self.entries[i]["textvariable"] = sV
 
     def GetFilter(self):
         result = {}
@@ -105,7 +105,7 @@ class FilterWindow:
                 if(filterResult[e] != ""):
                     filtered = result.loc[result[e] == filterResult[e]]
                     result = pd.DataFrame(filtered)
-
+            #? print method for debugging
             print(result)
             labelInput = self.comboBox.get()
             result[labelInput].plot()
